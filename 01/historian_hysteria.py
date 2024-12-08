@@ -37,6 +37,7 @@ def calc_similarity_score(first: list[int], second: list[int]):
     first_dict = dict(Counter(first))
     second_dict = dict(Counter(second))
 
+    # Find the similarity score per ID
     sim_score = 0
     for first_id in first_dict.keys():
         sim_score += second_dict.get(first_id, 0) * first_id
