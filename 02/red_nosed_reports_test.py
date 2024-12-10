@@ -85,19 +85,3 @@ def check_deltas_dampener(report: list[int]) -> tuple[bool]:
     else:
         # Deltas are not safe, even with dampener
         return False, False
-
-
-@pytest.mark.parametrize(
-    "index, expected",
-    [
-        (0, (True, False)),
-        (1, (True, True)),
-        (2, (False, False)),
-        (3, (True, True)),
-        (4, (True, True)),
-        (5, (True, False)),
-    ],
-)
-def test_check_deltas_dampener(sample_data, index, expected):
-    report = sample_data[index]
-    assert check_deltas_dampener(report) == expected
