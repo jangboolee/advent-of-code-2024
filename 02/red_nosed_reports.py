@@ -85,82 +85,63 @@ def calc_safe_reports(data: list[list[int]]) -> int:
 
 def calc_safe_report_dampener(data: list[list[int]]) -> int:
 
-    def check_report_dampener(report: list[int]) -> bool:
-        """Helper to check if a single report is safe or not, with a single
-        problem dampener
+    def is_monotonic(report: list[int]) -> bool:
+        """Helper to check if the report increases or decreases monotonically
 
         Args:
             report (list[int]): A single report
 
         Returns:
-            bool: True if the report is safe, False if not
+            bool: True if the report increases or decreases monotonically,
+                False if not
         """
 
-        def check_deltas(report: list[int]) -> tuple[bool]:
-            """Helper to check if any two adjacent levels differ by at least
+        increasing = all(
+            report[i] < report[i + 1] for i in range(len(report) - 1)
+        )
+        decreasing = all(
+            report[i] > report[i + 1] for i in range(len(report) - 1)
+        )
+        return increasing or decreasing
+
+    def check_deltas(report: list[int]) -> bool:
+        """Helper to check if any two adjacent levels differ by at least
             1 and at most 3
 
-            Args:
-                report (list[int]): A single report
+        Args:
+            report (list[int]): A single report
 
-            Returns:
-                bool: True if deltas are within accepted levels, False if not
-            """
+        Returns:
+            bool: True if deltas are within accepted levels, False if not
+        """
+        return all(
+            1 <= abs(report[i] - report[i + 1]) <= 3
+            for i in range(len(report) - 1)
+        )
 
-            safe_deltas = sum(
-                [
-                    (
-                        0 < abs(report[i] - report[i + 1])
-                        and abs(report[i] - report[i + 1]) <= 3
-                    )
-                    for i in range(len(report) - 1)
-                ]
-            )
+    def check_single_removal(report: list[int]) -> bool:
+        """Check if a report can be fixed by removing one element
 
-            if safe_deltas == len(report) - 1:
-                # All deltas are safe, with no use of dampener
-                return True, False
-            elif safe_deltas == len(report) - 2:
-                # All deltas except one is safe, with dampener used
-                return True, True
-            else:
-                # Deltas are not safe, even with dampener
-                return False, False
+        Args:
+            report (list[int]): A single report
 
-        increasing = False
-
-        # Check increase/decrease for first two elements
-        if report[0] < report[1]:
-            increasing = True
-
-        if increasing:
-            # Check if levels are all increasing
-            all_increase = (
-                sum(
-                    [report[i] < report[i + 1] for i in range(len(report) - 1)]
-                )
-                >= len(report) - 2
-            )
-            if all_increase:
-                return check_deltas(report)
-            else:
-                return False
-        else:
-            # Check if the levels are all decreasing
-            all_decrease = (
-                sum(
-                    [report[i] > report[i + 1] for i in range(len(report) - 1)]
-                )
-                >= len(report) - 2
-            )
-            if all_decrease:
-                return check_deltas(report)
-            else:
-                return False
+        Returns:
+            bool: True if the report can be fixed by removing an element, False
+                if not
+        """
+        for i in range(len(report)):
+            removed_list = report[:i] + report[i + 1 :]
+            if is_monotonic(removed_list) and check_deltas(removed_list):
+                return True
+        return False
 
     safe_reports = 0
     for report in data:
-        safe_reports += check_report_dampener(report)
+        if is_monotonic(report) and check_deltas(report):
+            safe_reports += 1
+        else:
+            if check_single_removal(report):
+                safe_reports += 1
 
     return safe_reports
 
@@ -170,4 +151,3 @@ if __name__ == "__main__":
     data = read_input("02")
     safe_reports = calc_safe_reports(data)
     safe_reports_dampener = calc_safe_report_dampener(data)
-    pass
