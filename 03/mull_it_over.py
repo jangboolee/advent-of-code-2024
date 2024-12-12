@@ -67,8 +67,54 @@ def calculate_all_instructions(instructions: list[str]) -> int:
     return total
 
 
+def extract_mul_conditionals(memory: str) -> list[str]:
+    """Find mul() instructions alongside conditionals in the form of either
+    do() or don't()
+
+    Args:
+        memory (str): The corrupted memory
+
+    Returns:
+        list[str]: List of mul() instructions and conditionals
+    """
+
+    pattern = re.compile(
+        r"(?:mul\(\d{1,3},\d{1,3}\))|(?:do\(\))|(?:don't\(\))"
+    )
+    return re.findall(pattern, memory)
+
+
+def calculate_mul_conditionals(instructions: list[str]) -> int:
+    """Calculate mul() instructions while taking conditionals into account
+
+    Args:
+        instructions (list[str]): List of mul() instructions and conditionals
+
+    Returns:
+        int: Sum of mul() instructions with conditionals applied
+    """
+
+    enabled = True
+    total = 0
+
+    for instruction in instructions:
+        if instruction == "don't()":
+            enabled = False
+        elif instruction == "do()":
+            enabled = True
+        else:
+            if enabled:
+                total += execute_mul_instruction(instruction)
+
+    return total
+
+
 if __name__ == "__main__":
 
     data = read_input("03")
+    # Part 1
     mul_instructions = extract_mul_instructions(data)
     total_mul = calculate_all_instructions(mul_instructions)
+    # Part 2
+    mul_cond = extract_mul_conditionals(data)
+    total_mul_cond = calculate_mul_conditionals(mul_cond)
