@@ -16,80 +16,71 @@ def read_input(subfolder: str) -> str:
         return [line.rstrip() for line in f.readlines()]
 
 
-def check_right(line: str) -> int:
+def part_one(data: list[str]) -> int:
 
-    count = 0
-    for i in range(len(line) - 3):
-        snippet = line[i : i + 4]
-        if snippet == "XMAS":
-            count += 1
+    def check_right(line: str) -> int:
 
-    return count
-
-
-def check_left(line: str) -> int:
-
-    reverse = line[::-1]
-    return check_right(reverse)
-
-
-def check_down(data: list[str]) -> int:
-
-    count = 0
-    for row in range(len(data) - 3):
-        for col in range(len(data[row])):
-
-            snippet = ""
-            for i in range(4):
-                snippet += data[row + i][col]
+        count = 0
+        for i in range(len(line) - 3):
+            snippet = line[i : i + 4]
             if snippet == "XMAS":
                 count += 1
 
-    return count
+        return count
 
+    def check_left(line: str) -> int:
 
-def check_up(data: list[str]) -> int:
+        reverse = line[::-1]
+        return check_right(reverse)
 
-    reverse = data[::-1]
-    return check_down(reverse)
+    def check_down(data: list[str]) -> int:
 
+        count = 0
+        for row in range(len(data) - 3):
+            for col in range(len(data[row])):
 
-def check_right_down(data: list[str]) -> int:
+                snippet = ""
+                for i in range(4):
+                    snippet += data[row + i][col]
+                if snippet == "XMAS":
+                    count += 1
 
-    count = 0
-    for row in range(len(data) - 3):
-        for col in range(len(data[row]) - 3):
+        return count
 
-            snippet = ""
-            for i in range(4):
-                snippet += data[row + i][col + i]
-            if snippet == "XMAS":
-                count += 1
+    def check_up(data: list[str]) -> int:
 
-    return count
+        reverse = data[::-1]
+        return check_down(reverse)
 
+    def check_right_down(data: list[str]) -> int:
 
-def check_right_up(data: list[str]) -> int:
+        count = 0
+        for row in range(len(data) - 3):
+            for col in range(len(data[row]) - 3):
 
-    reverse = data[::-1]
-    return check_right_down(reverse)
+                snippet = ""
+                for i in range(4):
+                    snippet += data[row + i][col + i]
+                if snippet == "XMAS":
+                    count += 1
 
+        return count
 
-def check_left_down(data: list[str]) -> int:
+    def check_right_up(data: list[str]) -> int:
 
-    reverse = [row[::-1] for row in data]
-    return check_right_down(reverse)
+        reverse = data[::-1]
+        return check_right_down(reverse)
 
+    def check_left_down(data: list[str]) -> int:
 
-def check_left_up(data: list[str]) -> int:
+        reverse = [row[::-1] for row in data]
+        return check_right_down(reverse)
 
-    reverse = [row[::-1] for row in data][::-1]
-    return check_right_down(reverse)
+    def check_left_up(data: list[str]) -> int:
 
+        reverse = [row[::-1] for row in data][::-1]
+        return check_right_down(reverse)
 
-if __name__ == "__main__":
-
-    data = read_input("04")
     total = 0
     for line in data:
         total += check_right(line) + check_left(line)
@@ -100,4 +91,11 @@ if __name__ == "__main__":
     total += check_left_down(data)
     total += check_left_up(data)
 
-    print(total)
+    return total
+
+
+if __name__ == "__main__":
+
+    data = read_input("04")
+    part_one_ans = part_one(data)
+    print(part_one_ans)
