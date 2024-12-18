@@ -1,4 +1,5 @@
 from pathlib import Path
+from math import floor
 
 
 def read_input(subfolder: str) -> tuple[list[tuple], list[tuple]]:
@@ -16,7 +17,7 @@ def read_input(subfolder: str) -> tuple[list[tuple], list[tuple]]:
         lines = [line.rstrip() for line in f.readlines()]
 
     rules = []
-    update = []
+    updates = []
 
     # Toggle to add item to rules or update
     add_rule = True
@@ -30,12 +31,60 @@ def read_input(subfolder: str) -> tuple[list[tuple], list[tuple]]:
             rules.append(tuple([int(item) for item in line.split("|")]))
         # Add updates as a tuple
         else:
-            update.append(tuple([int(item) for item in line.split(",")]))
+            updates.append(tuple([int(item) for item in line.split(",")]))
 
-    return rules, update
+    return rules, updates
+
+
+def check_update_item(item: int, update: tuple, rules: list[tuple]) -> bool:
+
+    # Get the other items before and after the given item in the update
+    update_before = update[: update.index(item)]
+    update_after = update[update.index(item) :]
+
+    valid = True
+    for first, second in rules:
+        if first == item:
+            if second in update_before:
+                valid = False
+        if second == item:
+            if first in update_after:
+                valid = False
+
+    return valid
+
+
+def find_correct_updates(
+    rules: list[tuple], updates: list[tuple]
+) -> list[tuple]:
+
+    correct_updates = []
+    for update in updates:
+        update_check_results = []
+        # Check each item's validity in each update
+        for item in update:
+            update_check_results.append(check_update_item(item, update, rules))
+        # Save update only if all items are valid
+        if all(update_check_results):
+            correct_updates.append(update)
+
+    return correct_updates
+
+
+def sum_middle_pgs(updates: list[tuple]) -> int:
+
+    total = 0
+    for update in updates:
+
+        mid_i = floor(len(update) / 2)
+        total += update[mid_i]
+
+    return total
 
 
 if __name__ == "__main__":
 
-    rules, update = read_input("05")
+    rules, updates = read_input("05")
+    correct_updates = find_correct_updates(rules, updates)
+    middle_pg_sum = sum_middle_pgs(correct_updates)
     pass
