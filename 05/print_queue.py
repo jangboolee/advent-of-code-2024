@@ -71,6 +71,13 @@ def find_correct_updates(
     return correct_updates
 
 
+def find_wrong_updates(
+    all_updates: list[tuple], correct_updates: list[tuple]
+) -> list[tuple]:
+
+    return [update for update in all_updates if update not in correct_updates]
+
+
 def sum_middle_pgs(updates: list[tuple]) -> int:
 
     total = 0
@@ -87,4 +94,6 @@ if __name__ == "__main__":
     rules, updates = read_input("05")
     correct_updates = find_correct_updates(rules, updates)
     middle_pg_sum = sum_middle_pgs(correct_updates)
+
+    wrong_updates = find_wrong_updates(updates, correct_updates)
     pass
